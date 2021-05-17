@@ -32,6 +32,20 @@ from sklearn.model_selection import GridSearchCV
 
 
 def load_data(database_filepath):
+    '''
+    Load data from SQL database, then separate to dependent (Y) and
+    independent (X) variable sets. Outputs X and Y datasets and list of
+    variables of Y
+
+    Parameter:
+        database_filepath (str): filepath of db file
+
+    Returns:
+        X (pandas dataframe): the messages to be processed into dependant
+            variable for machine learning purpose
+        Y (pandas dataframe): flags for categories of the messages
+        Y.columns (list): list of Y variables
+    '''
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('disaster_response', engine)
     X = df['message']
@@ -41,6 +55,17 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    '''
+    Text tokenizing function for messages. Replaces URLs with placeholder,
+    remove punctuations, then tokenize, lemmatize, lowercase and strip
+    whitespaces from the words. Output cleaned tokens for machine learning
+
+    Parameter:
+        text (str): string of single text message in English
+
+    Output:
+        clean_tokens (list): list of tokenized words
+    '''
     url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
 
     # Find URLs in text
@@ -70,6 +95,17 @@ def tokenize(text):
 
 
 def build_model():
+    '''
+    Build and output pipeline including vectorizer, TF-IDF transformer and
+    random forest classifier with multi-output classifier
+
+    Parameters:
+        None
+
+    Output:
+        pipeline (sklearn Pipeline): Model pipeline for multi-output
+            classification
+    '''
     # Build pipeline including vectorizer, TF-IDF transformer and
     # random forest classifier with multi-output classifier for
     # predicting multiple target variables
@@ -83,6 +119,20 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    '''
+    Evaluate multi-output model and print classification report for each Y
+    output including precision, recall, and F1 scores
+
+    Parameters:
+        model (sklearn Pipeline): pipeline including vectorizer, transformer,
+            and multi-output classifier
+        X_test (pandas DataFrame): input variables for model
+        Y_test (pandas DataFrame): actual output variables for model evaluation
+        category_names (list): list of output categories
+
+    Output:
+        None
+    '''
     # Use model to predict Y based on X_test
     predicted = model.predict(X_test)
     predicted_df = pd.DataFrame(predicted, columns=Y_test.columns)
@@ -94,6 +144,16 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    '''
+    Save model as a pickle file
+
+    Parameters:
+        model (sklearn Pipeline): model to be saved
+        model_filepath (str): filepath for saving (including file extension)
+
+    Output:
+        None
+    '''
     with open(model_filepath, 'wb') as file:
         pickle.dump(model, file)
 
