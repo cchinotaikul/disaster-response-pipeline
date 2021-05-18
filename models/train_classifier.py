@@ -111,8 +111,12 @@ def build_model():
     # random forest classifier with multi-output classifier for
     # predicting multiple target variables
     pipeline = Pipeline([
-        ('vect', CountVectorizer(tokenizer=tokenize)),
-        ('tfidf', TfidfTransformer()),
+        # ngram_range of (1,2), max_features of 10000 produces better model
+        # according to grid search
+        ('vect', CountVectorizer(tokenizer=tokenize, ngram_range=(1,2),
+                                 max_features=10000)),
+        # use_idf set to false produces better model according to grid search
+        ('tfidf', TfidfTransformer(use_idf=False)),
         ('clf', MultiOutputClassifier(RandomForestClassifier(), n_jobs=-1))
     ])
 
