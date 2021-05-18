@@ -78,13 +78,13 @@ Files in this repository include:
 
 The project is composed of the following key steps:
 
-1. An ETL (Extract, Transform and Load) pipeline that reads the provided CSV file and saves as an SQL database
-2. A machine learning pipeline that uses count vectorizer, TF-IDF transformer and classify the data using random forest classifier and multi-output classifiers to classify the data based on the given categories. The model is saved as a pickle file
+1. An ETL (Extract, Transform and Load) pipeline that reads the provided CSV file, clean the data, and saves as an SQL database
+2. A machine learning pipeline that uses count vectorizer, TF-IDF transformer and classify the data using random forest classifier and multi-output classifiers to classify the data based on the given categories, with optimal parameters determined using grid search. The model is saved as a pickle file
 3. A web app created with Flask which uses the model to predict the categories of new messages, as well as display visualisations of the source data file created with Plotly
 
 With the default parameters for the implementations in the sklearn package, the performance of the model is quite satisfactory, with good (over 0.9) precision, accuracy and F1 scores for most of the categories.
 
-Further potential adjustments to the parameters were explored using grid search.
+Grid search is performed on a smaller sample size of data due to computing power limitation. Once the optimal parameters are determined, the model is trained with those parameters on the full training data set. A slight improvement in overall performance based on scores was observed.
 
 ## Acknowledgement and Licensing
 
