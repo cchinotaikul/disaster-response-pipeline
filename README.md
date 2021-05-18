@@ -22,7 +22,7 @@ Data analysis and web app created using Python 3.8.5. Libraries used include:
 
 ## Project Motivation
 
-During modern times of crisis, the widespead use of smartphones allows those involved in the disaster, their friends and relatives, and parties who are looking to assist a large amount of messsages would be sent out. However; this can present a challenge for those involved in the relief efforts to filter for messages that are most relevant to be immediately acted upon. A classifier which allows response teams to quickly categorize messages would be greatly beneficial to this end.
+During modern times of crisis, the widespead use of smartphones allows those involved in the disaster, their friends and relatives, rescue workers, reporters, etc., to send out a large amount of messages on social media for various purposes. However; this can present a challenge for those involved in the relief efforts to filter for messages that are most relevant to be immediately acted upon. A classifier which allows response teams to quickly categorize messages would be greatly beneficial to this end.
 
 ## File Descriptions
 
