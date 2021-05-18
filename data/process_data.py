@@ -68,12 +68,12 @@ def clean_data(df):
     # concatenate the original dataframe with the new `categories` dataframe
     df = df.merge(categories, left_index=True, right_index=True)
 
+    # Drop rows in 'related' where value is not binary (2)
+    to_drop = df[df['related'] == 2].index
+    df = df.drop(index=to_drop)
+
     # drop duplicates
     df = df.drop_duplicates()
-
-    # There are certain messages in related column marked as 2
-    # Appears to be error, therefore changed to 0
-    df['related'] == df['related'].apply(lambda x: 0 if x == 2 else x)
 
     return df
 
