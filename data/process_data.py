@@ -35,7 +35,7 @@ def clean_data(df):
     '''
     Clean the merged DataFrame, including creating columns with Boolean values
     for each message category and removing the original category columns,
-    dropping duplicates, and correcting apparently erroneous data.
+    dropping duplicates, and drop rows with invalid data
 
     Parameter:
         df (pandas DataFrame): DataFrame from load_data() function
