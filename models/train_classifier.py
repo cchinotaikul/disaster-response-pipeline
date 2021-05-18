@@ -8,9 +8,7 @@ import seaborn as sns
 import re
 import pickle
 from sqlalchemy import create_engine
-
 import nltk
-nltk.download(['punkt', 'wordnet'])
 
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
@@ -29,6 +27,8 @@ from nltk.stem import WordNetLemmatizer
 from sklearn.metrics import classification_report
 
 from sklearn.model_selection import GridSearchCV
+
+nltk.download(['punkt', 'wordnet'])
 
 
 def load_data(database_filepath):
@@ -66,7 +66,8 @@ def tokenize(text):
     Output:
         clean_tokens (list): list of tokenized words
     '''
-    url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    url_regex = ('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|'
+                 '[!*[(][)],]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 
     # Find URLs in text
     detected_urls = re.findall(url_regex, text)
@@ -163,7 +164,8 @@ def main():
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y,
+                                                            test_size=0.2)
 
         print('Building model...')
         model = build_model()
@@ -180,9 +182,9 @@ def main():
         print('Trained model saved!')
 
     else:
-        print('Please provide the filepath of the disaster messages database '\
-              'as the first argument and the filepath of the pickle file to '\
-              'save the model to as the second argument. \n\nExample: python '\
+        print('Please provide the filepath of the disaster messages database '
+              'as the first argument and the filepath of the pickle file to '
+              'save the model to as the second argument. \n\nExample: python '
               'train_classifier.py ../data/DisasterResponse.db classifier.pkl')
 
 
