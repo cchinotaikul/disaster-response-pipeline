@@ -95,32 +95,64 @@ def tokenize(text):
     return clean_tokens
 
 
-def build_model():
+def build_model(optimal_parameters=None):
     '''
     Build and output pipeline including vectorizer, TF-IDF transformer and
     random forest classifier with multi-output classifier
 
-    Parameters:
-        None
+    Parameter:
+        optimal_parameters (dict): dictionary of optimal parameters obtained
+            from grid search
 
     Output:
         pipeline (sklearn Pipeline): Model pipeline for multi-output
             classification
     '''
+    # If no parameters provided, use default parameters
+    if optimal_parameters is None:
+        ngram_range = (1, 1)
+        max_features = None
+        use_idf = True
+    else:
+        ngram_range = optimal_parameters['vect__ngram_range']
+        max_features = optimal_parameters['vect__max_features']
+        use_idf = optimal_parameters['tfidf__use_idf']
+
     # Build pipeline including vectorizer, TF-IDF transformer and
     # random forest classifier with multi-output classifier for
     # predicting multiple target variables
     pipeline = Pipeline([
-        # ngram_range of (1,2), max_features of 10000 produces better model
-        # according to grid search
-        ('vect', CountVectorizer(tokenizer=tokenize, ngram_range=(1,2),
-                                 max_features=10000)),
-        # use_idf set to false produces better model according to grid search
-        ('tfidf', TfidfTransformer(use_idf=False)),
-        ('clf', MultiOutputClassifier(RandomForestClassifier(), n_jobs=-1))
+        ('vect', CountVectorizer(tokenizer=tokenize, ngram_range=ngram_range,
+                                 max_features=max_features)),
+        ('tfidf', TfidfTransformer(use_idf=use_idf)),
+        ('clf', MultiOutputClassifier(RandomForestClassifier()))
     ])
 
     return pipeline
+
+
+def build_gridsearch_model(pipeline):
+    '''
+    Take classifier pipeline and build grid search model
+
+    Parameter:
+        pipeline (sklearn Pipeline): Model pipeline for multi-output
+            classification
+
+    Output:
+        cv (sklearn Pipeline): Pipeline with grid search
+    '''
+    # Parameters for grid search
+    parameters = {
+        'vect__ngram_range': ((1, 1), (1, 2)),
+        'vect__max_features': (None, 10000),
+        'tfidf__use_idf': (True, False)
+    }
+
+    # Build optimizing model with grid search
+    cv = GridSearchCV(pipeline, param_grid=parameters, n_jobs=6, verbose=10)
+
+    return cv
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
@@ -171,10 +203,26 @@ def main():
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y,
                                                             test_size=0.2)
 
+        # Build grid search model
         print('Building model...')
-        model = build_model()
+        pipeline = build_model()
+        model = build_gridsearch_model(pipeline)
 
-        print('Training model...')
+        print('Training grid search model on sample...')
+        # Find optimal parameters from grid search using a limited sample
+        X_train_sample = X_train.sample(n=2000, random_state=1)
+        Y_train_sample = Y_train.sample(n=2000, random_state=1)
+
+        model.fit(X_train_sample, Y_train_sample)
+
+        print("\nBest Parameters:", model.best_params_)
+        best_parameters = model.best_params_
+
+        # Return optimal parameters found by grid search and retrain model with
+        # full training dataset
+        print('Training optimised model on full set...')
+        model = build_model(best_parameters)
+
         model.fit(X_train, Y_train)
 
         print('Evaluating model...')
